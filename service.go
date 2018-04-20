@@ -114,14 +114,6 @@ func (s *s) Shutdown() {
 
 	s.Wait()
 
-	// log.Printf("shutdown Listener :%v\n", s.L)
-	// err := s.L.Close()
-	// if err != nil {
-	// 	log.Println(syscall.Getpid(), "Listener.Close() error:", err)
-	// } else {
-	// 	log.Println(syscall.Getpid(), s.L.Addr(), "Listener closed.")
-	// }
-
 	s.stopChan <- struct{}{}
 }
 
@@ -144,7 +136,6 @@ func (s *s) setDefaultHandle() {
 
 // Reload 重启
 func (s *s) Reload() (err error) {
-	// only one server isntance should fork!
 	if s.CanReLoad() == false {
 		return fmt.Errorf("forked count is %d More The %d ", s.reLoad, s.canReLoad)
 	}

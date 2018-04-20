@@ -22,7 +22,7 @@ type Service interface {
 	SetCanReLoad(count uint)                        // 设置可重启次数
 	CanReLoad() bool                                // 是否可以重启
 	IsChild() bool                                  // 是否子进程
-	SetSigHandle(sig os.Signal, f HandleFunc) error // 设置信号处理 注意：在已经监听后修改会重启进程！
+	SetSigHandle(sig os.Signal, f HandleFunc) error // 设置信号处理
 	SetNotifySigs(sigs []os.Signal) error           // 设置需要监控的信号量
 	Start()                                         // 开启监控 注意：必须以这个来堵塞
 	Reload() (err error)
@@ -44,11 +44,6 @@ func NewService(l net.Listener) Service {
 
 	// 设置默认处理
 	s.setDefaultHandle()
-
-	// 如果是子进程就杀掉父进程
-	// if s.IsChild() == true {
-	// 	syscall.Kill(syscall.Getppid(), syscall.SIGTSTP) //干掉父进程
-	// }
 
 	return s
 }
