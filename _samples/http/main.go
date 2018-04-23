@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"io"
 	"log"
 	"net/http"
@@ -13,6 +14,8 @@ import (
 type MyHandle struct{}
 
 func main() {
+	flag.Parse()
+
 	var server = http.Server{
 		Addr:        ":8888",
 		Handler:     &MyHandle{},

@@ -15,7 +15,7 @@ var (
 )
 
 func main() {
-	flag.IntVar(&port, "p", 8888, `要发送的内容`)
+	flag.IntVar(&port, "p", 8888, `端口`)
 	flag.Parse()
 
 	log.Printf("Actual pid is %d\n", syscall.Getpid())

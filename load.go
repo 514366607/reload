@@ -14,7 +14,6 @@ var (
 
 func init() {
 	flag.UintVar(&reLoad, "reLoad", 0, "重启次数")
-	flag.Parse()
 }
 
 // Service 服务
@@ -34,6 +33,10 @@ type Service interface {
 
 // NewService 初始化
 func NewService(l net.Listener) Service {
+	if flag.Parsed() == false {
+		panic(" You Must Run Flag.Parse() at Main Pack ! ")
+	}
+
 	var s = new(s)
 	s.L = l
 	s.reLoad = reLoad
