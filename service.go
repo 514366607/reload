@@ -127,11 +127,16 @@ func (s *s) setDefaultHandle() {
 		panic(err)
 	}
 
-	if err := s.SetSigHandle(syscall.SIGTSTP, func(s Service) {
-		s.Shutdown()
-	}); err != nil {
-		panic(err)
+	// 设置会退出的信号量
+	var stopSigs = []os.Signal{syscall.SIGINT, syscall.SIGTERM, syscall.SIGTSTP}
+	for _, sig := range stopSigs {
+		if err := s.SetSigHandle(sig, func(s Service) {
+			s.Shutdown()
+		}); err != nil {
+			panic(err)
+		}
 	}
+
 }
 
 // Reload 重启

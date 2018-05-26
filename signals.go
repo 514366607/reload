@@ -18,8 +18,8 @@ func init() {
 		syscall.SIGHUP,
 		syscall.SIGUSR1,
 		syscall.SIGUSR2,
-		//syscall.SIGINT,
-		//syscall.SIGTERM,
+		syscall.SIGINT,
+		syscall.SIGTERM,
 		syscall.SIGTSTP,
 	}
 }
