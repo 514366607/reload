@@ -78,6 +78,7 @@ func recvConnMsg(conn net.Conn, s reload.Service) {
 		}
 
 		var recv = string(buf[0:n])
+		recv = fmt.Sprintf(" pid %d Return: %s ", syscall.Getpid(), recv)
 		log.Printf("Rev Data : %v", recv)
 
 		conn.Write([]byte(recv))
