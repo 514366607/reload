@@ -7,11 +7,13 @@ import (
 	"log"
 	"net"
 	"reload"
+	"sync/atomic"
 	"syscall"
 )
 
 var (
-	port int
+	port     int
+	stopChan = make(chan struct{})
 )
 
 func main() {
@@ -29,7 +31,18 @@ func main() {
 	log.Printf("isChild : %v ,listener: %v\n", s.IsChild(), listener)
 
 	go func() {
-		for {
+		defer listener.Close()
+
+		var isAccept int32 = 1
+
+		go func() {
+			select {
+			case <-stopChan:
+				atomic.StoreInt32(&isAccept, 2)
+			}
+		}()
+
+		for atomic.LoadInt32(&isAccept) == 1 {
 			conn, err := listener.Accept()
 			if err != nil {
 				log.Println(err)
@@ -43,6 +56,7 @@ func main() {
 
 	s.Start()
 
+	stopChan <- struct{}{}
 }
 
 func recvConnMsg(conn net.Conn, s reload.Service) {
