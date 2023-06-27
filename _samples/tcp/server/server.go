@@ -6,14 +6,15 @@ import (
 	"io"
 	"log"
 	"net"
-	"reload"
 	"sync/atomic"
 	"syscall"
+
+	"github.com/514366607/reload"
 )
 
 var (
 	port     int
-	stopChan = make(chan struct{})
+	isAccept int32 = 1
 )
 
 func main() {
@@ -27,20 +28,17 @@ func main() {
 		log.Println(err)
 	}
 
-	var s = reload.NewService(listener)
+	var s = reload.NewServiceWith(listener, reload.WithDefaultHandle(), reload.WithHandleFunc(syscall.SIGUSR1, func(s reload.Service) {
+		if err := s.Reload(); err != nil {
+			s.Logger().Error(err)
+		}
+		log.Print("INlasdkjflaksjdflkasjdlkfajsldkfjaslkdfjaskldfjaslkdf\n\n\n\n\n\n\n\n\n\n")
+		atomic.StoreInt32(&isAccept, 0)
+	}))
 	log.Printf("isChild : %v ,listener: %v\n", s.IsChild(), listener)
 
 	go func() {
 		defer listener.Close()
-
-		var isAccept int32 = 1
-
-		go func() {
-			select {
-			case <-stopChan:
-				atomic.StoreInt32(&isAccept, 2)
-			}
-		}()
 
 		for atomic.LoadInt32(&isAccept) == 1 {
 			conn, err := listener.Accept()
@@ -55,8 +53,6 @@ func main() {
 	}()
 
 	s.Start()
-
-	stopChan <- struct{}{}
 }
 
 func recvConnMsg(conn net.Conn, s reload.Service) {
@@ -68,7 +64,6 @@ func recvConnMsg(conn net.Conn, s reload.Service) {
 
 	for {
 		n, err := conn.Read(buf)
-
 		if err == io.EOF {
 			//连接结束
 			return
@@ -82,6 +77,5 @@ func recvConnMsg(conn net.Conn, s reload.Service) {
 		log.Printf("Rev Data : %v", recv)
 
 		conn.Write([]byte(recv))
-
 	}
 }

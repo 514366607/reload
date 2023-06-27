@@ -1,13 +1,15 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"io"
 	"log"
 	"net/http"
-	"reload"
 	"syscall"
 	"time"
+
+	"github.com/514366607/reload"
 )
 
 // MyHandle 头
@@ -40,6 +42,11 @@ func main() {
 	}()
 
 	s.Start()
+
+	err = server.Shutdown(context.Background())
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (*MyHandle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
